@@ -7,9 +7,53 @@ export function     ListaRemeras(){
 
     const [remera, setRemeras] = useState([]);
 
+    const [mensajeError, setmensajeError] = useState('')
+    const [mensajeSuccess, setmensajeSuccess] = useState('')
+
+
+
     useEffect(()=>{
-        API.remeras().then(setRemeras)
+        API.getRemeras().then(setRemeras)
     },[])
+    
+
+    //BOTONES//
+
+    const bajaRemeras  = async(id)=>{
+        console.log('el id que vamos a dar de baja es el',id)
+
+        const user = await API.BajaRemeras(id)
+        if(user.status){
+            
+            setmensajeError(user.mensaje)
+            setTimeout(()=>{
+                setmensajeError('')
+                window.location.reload(true)
+            }, 3000)
+
+        }else{
+            setmensajeError(user.mensaje)
+            setTimeout(()=>{
+                setmensajeError('')
+            }, 4000)
+        }
+    }
+
+    const altaRemeras = async(id)=>{
+        const user = await API.AltaRemeras(id)
+        if(user.status){
+            setmensajeSuccess(user.mensaje)
+            setTimeout(()=>{
+                setmensajeSuccess('')
+                window.location.reload(true)
+            }, 3000)
+        }else{
+            setmensajeError(user.mensaje)
+            setTimeout(()=>{
+                setmensajeError('')
+            }, 4000)
+        }
+    }
     
     return(
 
@@ -34,17 +78,20 @@ export function     ListaRemeras(){
                     <tbody>
                         {remera.map((remeras)=>(
                         <tr className="">
-                            <td scope="row">{remeras.idremeras}</td>
+                            <td scope="row">{remeras.idRemeras}</td>
                             <td>{remeras.Talle}</td>
                             <td>{remeras.Cantidad}</td>
                             <td>{remeras.Color}</td>
                             <td>{remeras.Estado}</td>
                             <td>
                             <div className="btn-group" role="group" aria-label="Basic example">
-                                <button type="button" className="btn btn-outline-primary">Alta</button>
-                                <button type="button" className="btn btn-outline-secondary">Editar</button>
-                                <button type="button" className="btn btn-outline-danger">Baja</button>
-                                </div>
+                            { (remeras.Estado=='A')? 
+
+<button onClick={() => bajaRemeras(remeras.idRemeras,'B')} type="button" className="btn btn-outline-danger">Baja</button>
+:
+<button onClick={() =>altaRemeras(remeras.idRemeras,'A')} type="button" className="btn btn-outline-primary">Alta</button>
+
+}</div>
                             </td>
                         
                         </tr>

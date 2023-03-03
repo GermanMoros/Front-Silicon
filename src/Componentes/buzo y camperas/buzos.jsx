@@ -4,13 +4,57 @@ import * as API from '../../Servicios/Servicios'
 
 
 export function     ListaBuzos(){
-
     const [buzos, setBuzos] = useState([]);
 
+    const [mensajeError, setmensajeError] = useState('')
+    const [mensajeSuccess, setmensajeSuccess] = useState('')
+
+
+
     useEffect(()=>{
-        API.buzosycamperas().then(setBuzos)
+        API.getBuzosyCamperas().then(setBuzos)
     },[])
     
+
+    //BOTONES//
+
+    const bajaBuzosyCamperas  = async(id)=>{
+        console.log('el id que vamos a dar de baja es el',id)
+
+        const user = await API.BajaBuzosycamperas(id)
+        if(user.status){
+            
+            setmensajeError(user.mensaje)
+            setTimeout(()=>{
+                setmensajeError('')
+                window.location.reload(true)
+            }, 3000)
+
+        }else{
+            setmensajeError(user.mensaje)
+            setTimeout(()=>{
+                setmensajeError('')
+            }, 4000)
+        }
+    }
+
+    const altabuzosycamperas = async(id)=>{
+        const user = await API.Altabuzosycamperas(id)
+        if(user.status){
+            setmensajeSuccess(user.mensaje)
+            setTimeout(()=>{
+                setmensajeSuccess('')
+                window.location.reload(true)
+            }, 3000)
+        }else{
+            setmensajeError(user.mensaje)
+            setTimeout(()=>{
+                setmensajeError('')
+            }, 4000)
+        }
+    }
+
+
     return(
 
         <div className="card table bg-dark text-white">
@@ -32,7 +76,7 @@ export function     ListaBuzos(){
                     </thead>
                     <tbody>
                         {buzos.map((buzosycamperas)=>(
-                        <tr className="">
+                        <tr key={buzosycamperas.idBuzosyCamperas}>
                             <td scope="row">{buzosycamperas.idBuzosyCamperas}</td>
                             <td>{buzosycamperas.Talle}</td>
                             <td>{buzosycamperas.Cantidad}</td>
@@ -40,9 +84,13 @@ export function     ListaBuzos(){
                             <td>{buzosycamperas.Estado}</td>
                             <td>
                             <div className="btn-group" role="group" aria-label="Basic example">
-                                <button type="button" className="btn btn-outline-primary">Alta</button>
-                                <button type="button" className="btn btn-outline-secondary">Editar</button>
-                                <button type="button" className="btn btn-outline-danger">Baja</button>
+                            { (buzosycamperas.Estado=='A')? 
+
+<button onClick={() => bajaBuzosyCamperas(buzosycamperas.idBuzosyCamperas,'B')} type="button" className="btn btn-outline-danger">Baja</button>
+:
+<button onClick={() =>altabuzosycamperas(buzosycamperas.idBuzosyCamperas,'A')} type="button" className="btn btn-outline-primary">Alta</button>
+
+}
                                 </div>
                             </td>
                         </tr>

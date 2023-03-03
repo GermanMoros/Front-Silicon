@@ -7,10 +7,54 @@ export function     ListaMallas(){
 
     const [malla, setMallas] = useState([]);
 
+    const [mensajeError, setmensajeError] = useState('')
+    const [mensajeSuccess, setmensajeSuccess] = useState('')
+
+
+
     useEffect(()=>{
-        API.mallas().then(setMallas)
+        API.getMallas().then(setMallas)
     },[])
     
+
+    //BOTONES//
+
+    const bajaMallas  = async(id)=>{
+        console.log('el id que vamos a dar de baja es el',id)
+
+        const user = await API.BajaMallas(id)
+        if(user.status){
+            
+            setmensajeError(user.mensaje)
+            setTimeout(()=>{
+                setmensajeError('')
+                window.location.reload(true)
+            }, 3000)
+
+        }else{
+            setmensajeError(user.mensaje)
+            setTimeout(()=>{
+                setmensajeError('')
+            }, 4000)
+        }
+    }
+
+    const altaMallas = async(id)=>{
+        const user = await API.AltaMallas(id)
+        if(user.status){
+            setmensajeSuccess(user.mensaje)
+            setTimeout(()=>{
+                setmensajeSuccess('')
+                window.location.reload(true)
+            }, 3000)
+        }else{
+            setmensajeError(user.mensaje)
+            setTimeout(()=>{
+                setmensajeError('')
+            }, 4000)
+        }
+    }
+
     return(
 
         <div className="card table bg-dark text-white">
@@ -41,10 +85,14 @@ export function     ListaMallas(){
                             <td>{mallas.Estado}</td>
                             <td>
                             <div className="btn-group" role="group" aria-label="Basic example">
-                                <button type="button" className="btn btn-outline-primary">Alta</button>
-                                <button type="button" className="btn btn-outline-secondary">Editar</button>
-                                <button type="button" className="btn btn-outline-danger">Baja</button>
-                                </div>
+                            { (mallas.Estado=='A')? 
+
+<button onClick={() => bajaMallas(mallas.idMallas,'B')} type="button" className="btn btn-outline-danger">Baja</button>
+:
+<button onClick={() =>altaMallas(mallas.idMallas,'A')} type="button" className="btn btn-outline-primary">Alta</button>
+
+}
+</div>
                             </td>
                         </tr>
                     ))}
